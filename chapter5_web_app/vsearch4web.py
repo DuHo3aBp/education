@@ -18,5 +18,5 @@ def do_search() -> 'html':
 @app.route('/entry')
 def entry_page() -> 'html':
         return render_template('entry.html', the_title='Welcome to search4letters web!')
-
-app.run(debug=True) #режим отладки автомато перезапускает вебсервер если видит изменения
+if __name__ == '__main__':      #позволяет запускать вебприл. локально
+        app.run(debug=True) #режим отладки автомато перезапускает вебсервер если видит изменения
