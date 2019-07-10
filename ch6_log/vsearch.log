@@ -1,0 +1,10 @@
+ImmutableMultiDict([('phrase', 'python'), ('letters', 'aeiou')])
+127.0.0.1
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+{'o'}
+ImmutableMultiDict([('phrase', 'quackamolle'), ('letters', 'aeiou')])
+127.0.0.1
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+{'e', 'a', 'o', 'u'}
+ImmutableMultiDict([('phrase', 'blabla'), ('letters', 'aeiou')])|127.0.0.1|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36|{'a'}
+ImmutableMultiDict([('phrase', '‚‡Ï‰‰llfdkse'), ('letters', 'aeiou')])|127.0.0.1|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36|{'e'}
