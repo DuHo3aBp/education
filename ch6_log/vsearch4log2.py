@@ -30,14 +30,18 @@ def entry_page() -> 'html':
         return render_template('entry.html', the_title='Welcome to search4letters web!')
 
 @app.route('/viewlog')  #будем читать лог со страницы
-def view_the_log() -> 'str':      #объявляем новую функцию
+def view_the_log() -> 'html':      #объявляем новую функцию
         contents = []   #создать новый пустой список
         with open('vsearch.log') as log:        #открываем файл журнала для чтения и связываем с log
                 for line in log:        #организовать цикл по строкам в файловом потоке log
                         contents.append([])     #добавить новый, пустой список в конец contents
                         for item in line.split('|'): #разбить строку а затем обработкать каждый эл-т в списке
                                 contents[-1].append(escape(item)) #записать экранированные данные в конец списка
-        return str(contents) #возвращаем список строк, escape экранирует символы <> для отобр-я в браузере
+        titles = ('Form data', 'Remote_addr', 'User_agent', 'Results')
+        return render_template ('viewlog.html',
+                                the_title='View log',
+                                the_row_titles=titles,
+                                the_data=contents,)
 
 if __name__ == '__main__':      #позволяет запускать вебприл. локально
         app.run(debug=True) #режим отладки автомато перезапускает вебсервер если видит изменения
