@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\OlegDev\\AppData\\Local\\Programs\\Python\\Python37-32\\python.exe",
+    "python.pythonPath": ".venv\\Scripts\\python.exe",
     "python.testing.pytestArgs": [
         "chapter 4_functions"
     ],
