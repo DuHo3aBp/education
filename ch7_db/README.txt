@@ -33,5 +33,7 @@
         -> browser_string varchar(256) not null,
         -> results varchar(64) not null );
     
-    посмотреть что было создано в таблице командой describe log;
-    показать иена всех таблиц БД show tables;
+    посмотреть что было создано в таблице командой: describe log;
+    показать имена всех таблиц БД: show tables;
+    показать все записи в таблице log: select * from log;
+

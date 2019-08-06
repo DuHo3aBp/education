@@ -4,13 +4,26 @@ from vsearch6 import search4letters
 app = Flask (__name__)
 
 def log_request(req: 'flask_request', res: str) -> None:        #req передает объект запроса
-        with open('vsearch.log', 'a') as log:                   #res передает результат вызова 
-               """ print(req.form, file = log, end='|') #данные из html формы приложения
-                print(req.remote_addr, file = log, end='|')  #IP-адрес приславшешго форму
-                print(req.user_agent, file = log, end='|')   #строка, идент-ая веб браузер пользователя
-                print(res, file = log)          #None говорит, что ф-я ничего не возвращает
-                  """
-               print(req.form, req.remote_addr, req.user_agent, res, file=log, sep='|') #один принт вместо 4х
+    """изменили функцию, Журналирует веб-запрос в БД и возвращает результаты"""
+    dbconfig = { 'host': '127.0.0.1',   #определяем параметры соединения
+                 'user': 'vsearch',
+                 'password': 'vsearchpasswd',
+                 'database': 'vsearchlogDB', }
+    import mysql.connector  #импортируем драйвер
+    conn = mysql.connector.connect(**dbconfig)  #устанавливаем соединение
+    cursor = conn.cursor()  #создаем курсор
+    _SQL = """  insert into log
+                (phrase, letters, ip, browser_string, results)
+                values
+                (%s, %s, %s, %s, %s)""" # создзаем строку с текстом запроса для записи в БД
+    cursor.execute(_SQL,(req.form['phrase'],   #выполняем запрос
+                         req.form['letters'],
+                         req.remote_addr,
+                         req.user_agent.browser,   #из строки с описанием браузера извлекается только его название
+                         res,))
+    conn.commit()   #записываем данные в БД и закрываем курсор и соединение
+    cursor.close()
+    conn.close()
 
 @app.route('/search4', methods=['POST'])
 def do_search() -> 'html':
