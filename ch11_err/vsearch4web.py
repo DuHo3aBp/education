@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, escape, session #render_template принимает имя шаблона со всеми аргументами и возвращает строку с разметкой HTML
 from vsearch6 import search4letters
 
-from DBmc import UseDatabase
+from DBmc import UseDatabase, CredentialsError, ConnectionError
 
 from checker import check_logged_in #импортируем декоратор
+
+from time import sleep
 
 app = Flask (__name__)
 
@@ -44,7 +46,10 @@ def do_search() -> 'html':
         letters = request.form['letters']
         title = 'Here are your results:'
         results = str(search4letters(phrase, letters))
-        log_request(request,results)    #вызов функции журналирования
+        try:
+            log_request(request,results)    #вызов функции журналирования
+        except Exception as err:
+            print('***** Logging failed with this error:', str(err))
         return render_template('results.html', 
                                the_phrase = phrase,
                                the_letters = letters,
@@ -59,22 +64,30 @@ def entry_page() -> 'html':
 @app.route('/viewlog')  #будем читать лог со страницы
 def view_the_log() -> 'html':      #объявляем новую функцию
         """Выводит содержимое файла журнала в виде HTML таблицы"""
-        with UseDatabase(app.config['dbconfig']) as cursor:
-                _SQL = """select phrase, letters, ip, browser_string, results 
-                                from log"""
-                """отправляем запрос на сервер
-                затем извлекаем результаты (присваиваются
-                переменной contents"""        
-                cursor.execute(_SQL)
-                contents = cursor.fetchall()
-        
-        """определяем имена столбцов"""
-        titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
-        
-        return render_template ('viewlog.html',
-                                the_title='View log',
-                                the_row_titles=titles,
-                                the_data=contents,)
+        try:
+            with UseDatabase(app.config['dbconfig']) as cursor:
+                    _SQL = """select phrase, letters, ip, browser_string, results 
+                                    from log"""
+                    """отправляем запрос на сервер
+                    затем извлекаем результаты (присваиваются
+                    переменной contents"""        
+                    cursor.execute(_SQL)
+                    contents = cursor.fetchall()
+            
+            """определяем имена столбцов"""
+            titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
+            
+            return render_template ('viewlog.html',
+                                    the_title='View log',
+                                    the_row_titles=titles,
+                                    the_data=contents,)
+        except ConnectionError as err:
+            print('Is your database switched on? Error:', str(err))
+        except CredentialsError as err:
+            print('Wrong user ID or Password or wrong database. Error:', str(err))
+        except Exception as err:
+            print('Something went wrong', str(err))
+        return 'Error.'
 
 app.secret_key = 'YouWillNeverGuessMySecretKey'
 
