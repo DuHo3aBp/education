@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, escape, session #render_template принимает имя шаблона со всеми аргументами и возвращает строку с разметкой HTML
+from flask import copy_current_request_context
+
 from vsearch6 import search4letters
 
-from DBmc import UseDatabase, CredentialsError, ConnectionError
-
+from DBmc import UseDatabase, CredentialsError, ConnectionError, SQLError
 from checker import check_logged_in #импортируем декоратор
 
 from time import sleep
@@ -41,6 +42,19 @@ def log_request(req: 'flask_request', res: str) -> None:        #req перед�
     
 @app.route('/search4', methods=['POST'])
 def do_search() -> 'html':
+    @copy_current_request_context
+    def log_request(req: 'flask_request', res: str)  -> None:
+        sleep(15) #this makes log_request wery slow...
+        with UseDatabase(app.config['dbconfig']) as cursor:
+            _SQL = """ insert into log
+                    (phrase, letters, ip, browser_string, results)
+                    values
+                    (%s, %s, %s, %s, %s)"""
+            cursor.execute(_SQL, (req.form['phrase'],
+                                req.form['letters'],
+                                req.remote_addr,
+                                req.user_agent.browser,
+                                res, ))
         """Извлекает данные из запроса, выполняет поиск, возвращает результаты"""
         phrase = request.form['phrase']
         letters = request.form['letters']
@@ -51,9 +65,9 @@ def do_search() -> 'html':
         except Exception as err:
             print('***** Logging failed with this error:', str(err))
         return render_template('results.html', 
+                               the_title = title,
                                the_phrase = phrase,
                                the_letters = letters,
-                               the_title = title,
                                the_results=results,)
 @app.route('/')
 @app.route('/entry')
@@ -67,7 +81,7 @@ def view_the_log() -> 'html':      #объявляем новую функцию
         try:
             with UseDatabase(app.config['dbconfig']) as cursor:
                     _SQL = """select phrase, letters, ip, browser_string, results 
-                                    from log"""
+                            from log"""
                     """отправляем запрос на сервер
                     затем извлекаем результаты (присваиваются
                     переменной contents"""        
@@ -85,9 +99,11 @@ def view_the_log() -> 'html':      #объявляем новую функцию
             print('Is your database switched on? Error:', str(err))
         except CredentialsError as err:
             print('Wrong user ID or Password or wrong database. Error:', str(err))
+        except SQLError as err:
+            print('Is your query correct? Error:', str(err))
         except Exception as err:
             print('Something went wrong', str(err))
-        return 'Error.'
+        return 'Sorry! There is an Error occured. Please try later or call to Oleg.'
 
 app.secret_key = 'YouWillNeverGuessMySecretKey'
 
