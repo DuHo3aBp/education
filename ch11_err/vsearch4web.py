@@ -32,9 +32,9 @@ def do_search() -> 'html':
         @copy_current_request_context #юзаем декоратор, чтобы данные не очищались до выполнения ф-ии
         def log_request(req: 'flask_request', res: str) -> None:        #req передает объект запроса
             """Функция журналирует веб-запрос в БД и возвращает результаты"""
+            sleep(15) #this makes log_request wery slow...
             """Теперь используем диспетчер контекста UseDatabase, которому передаем
             настройки app.config"""
-            sleep(15) #this makes log_request wery slow...
             with UseDatabase(app.config['dbconfig']) as cursor:
                 _SQL = """insert into log
                         (phrase, letters, ip, browser_string, results)
