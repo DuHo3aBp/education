@@ -2,3 +2,5 @@
 в папке C:\edu\chapter4_functions\modules\dist запускаем py -3 -m pip install vsearch6-1.0.tar.gz
 
 2. устанавливаем flask pip install flask
+
+3. установить драйвер БД sql
